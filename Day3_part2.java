@@ -5,16 +5,16 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Day3_part2 {
-    public static void main(String[] args) throws IOException{
+    public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new FileReader("input.txt"));
         String line = null;
-        // String regex = "mul\\((\\d{1,3}),\\d{1,3}\\)"; 
+        // String regex = "mul\\((\\d{1,3}),\\d{1,3}\\)";
         String regex = "mul\\((\\d{1,3}),(\\d{1,3})\\)|(do\\(\\)|don't\\(\\))";
         Pattern pattern = Pattern.compile(regex);
         int tot = 0;
         boolean flag = true;
 
-        while(( line = br.readLine()) != null) {
+        while ((line = br.readLine()) != null) {
             Matcher matcher = pattern.matcher(line);
             while (matcher.find()) {
                 System.out.println("Found: " + matcher.group());
@@ -41,8 +41,6 @@ public class Day3_part2 {
         }
         System.out.println(tot);
         br.close();
-
-
 
     }
 }
