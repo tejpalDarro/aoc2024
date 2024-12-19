@@ -1,20 +1,27 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.sql.Array;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.*;
 
 public class Day11_part2 {
 
-    private static final Map<Long, Long> memoCache = new HashMap<>();
+    private static final List<Integer> input = new ArrayList<>();
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new FileReader("input.txt"));
         String line = null;
         long res = 0;
-        line = br.readLine();
+        while ((line = br.readLine()) != null) {
+            String[] str = line.split(" ");
+            for (String s : str) {
+                input.add(Integer.parseInt(s.trim()));
+            }
+        }
         long startTime = System.nanoTime();
-        res = foo(line);
+        res = foo(input, 75);
         long endTime = System.nanoTime();
         long dur = endTime - startTime;
         System.out.println("Result: " + res);
@@ -30,39 +37,44 @@ public class Day11_part2 {
         br.close();
     }
 
-    public static long foo(String string) {
-        long ans = 0;
-        int blinks = 75;
-        for (String s : string.split(" ")) {
-            // System.out.println(s);
-            ans += bar(Integer.parseInt(s.trim()), blinks);
-            System.out.println("string: " + s + ", ans: " + ans);
-        }
-        return ans;
+    public static long foo(List<Integer> inp, int blinks) {
+        Map<String, Long> mem = new HashMap<>();
+        return inp.stream().mapToLong(num -> bar(num, blinks, mem)).sum();
     }
 
-    public static long bar(int s, int blinks) {
-        blinks--;
-        long key = s * 100 + blinks;
-        if (memoCache.containsKey(key))
-            return memoCache.get(key);
-        long total = 0;
-        if (blinks >= 0) {
-            if (s == 0) {
-                total += bar(1, blinks);
-            } else if (countDigit(s) % 2 == 0) {
-                int pow = (int) Math.pow(10, countDigit(s) / 2);
-                total += bar(s / pow, blinks);
-                total += bar(s % pow, blinks);
-            } else {
-                total += bar(s * 2024, blinks);
-            }
+    public static long bar(long num, int i, Map<String, Long> mem) {
+        if (i == 0)
+            return 1;
 
-        } else {
-            total = 1;
+        String key = num + "," + i;
+        if (mem.containsKey(key))
+            return mem.get(key);
+
+        long total = 0;
+        List<Long> arr = rules(num);
+        for (long n : arr) {
+            total += bar(n, i - 1, mem);
         }
-        memoCache.put(key, total);
+        mem.put(key, total);
         return total;
+    }
+
+    public static List<Long> rules(long number) {
+
+        if (number == 0) {
+            return Arrays.asList(1l);
+        }
+
+        String numStr = Long.toString(number);
+        int len = numStr.length();
+
+        if (len % 2 == 0) {
+            String left = numStr.substring(0, len / 2);
+            String right = numStr.substring(len / 2);
+            return Arrays.asList(Long.parseLong(left), Long.parseLong(right));
+        }
+
+        return Arrays.asList(number * 2024);
     }
 
     public static int countDigit(int n) {
